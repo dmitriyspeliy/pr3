@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    open-in-view: false
+    show-sql: true
+  banner:
+    location: banner.txt
+  r2dbc:
+    url: ${HOST_DB:r2dbc:postgresql://localhost:5432/rest}
+    username: ${DB_USER:admin}
+    password: ${DB_USER:admin}
+  flyway:
+    url: ${HOST_DB:jdbc:postgresql://localhost:5432/rest}
+    baselineOnMigrate: true
+    enabled: true

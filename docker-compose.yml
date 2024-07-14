@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "rest"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    volumes:
+      - /postgresql:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+  postgres-test:
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "rest-test"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    volumes:
+      - /postgresql:/var/lib/postgresql
+    ports:
+      - "5433:5432"
