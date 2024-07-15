@@ -3,10 +3,13 @@ package com.effectivemobile.practice3.service;
 import com.effectivemobile.practice3.mapper.TaskMapper;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.repository.impl.TaskRepositoryImpl;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,18 +21,35 @@ import java.util.Optional;
 @Slf4j
 public class TaskService {
 
-    private final TaskRepository taskRepository;
+    private final TaskRepositoryImpl taskRepository;
     private final TaskMapper taskMapper;
+    private final String cleanRate = "600000"; //10 mins
 
+
+    @Cacheable("tasks")
     public Flux<Task> getAllTask() {
         return taskRepository.findAll();
     }
 
+    @CacheEvict(value = "tasks", allEntries = true)
+    @Scheduled(fixedRateString = cleanRate)
+    public void emptyTasksCache() {
+        log.info("Emptying Tasks cache");
+    }
+
+    @Cacheable("task")
     public Mono<Task> findByTaskId(Long taskId) {
         return taskRepository.findById(taskId);
     }
 
+    @CacheEvict(value = "task", allEntries = true)
+    @Scheduled(fixedRateString = cleanRate)
+    public void emptyTaskCache() {
+        log.info("Emptying Task cache");
+    }
+
     public Mono<Void> deleteTask(Long taskId) {
+        log.info("Delete task by id " + taskId);
         return findByTaskId(taskId)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
@@ -42,24 +62,25 @@ public class TaskService {
     }
 
     public Mono<Task> refreshById(Long taskId, TaskDto taskDto) {
+        log.info("Refresh task by id " + taskId);
         return findByTaskId(taskId)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
                 .flatMap(optionalTutorial -> {
                     if (optionalTutorial.isPresent()) {
-                        Task entityTask = taskMapper.toEntityTask(taskDto);
-                        entityTask.setId(taskId);
-                        return taskRepository.save(entityTask);
+                        return taskRepository.updateById(taskId, taskDto);
                     }
                     return Mono.error(new BadRequestException("Couldn't find task by task id " + taskId));
                 });
     }
 
     public Mono<Task> findByTitle(String title) {
+        log.info("Find task by title " + title);
         return taskRepository.findByTitle(title);
     }
 
     public Mono<Task> createTask(TaskDto taskDto) {
+        log.info("Create new task");
         return findByTitle(taskDto.getTitle())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
