@@ -7,9 +7,10 @@ import com.effectivemobile.practice3.repository.impl.TaskRepositoryImpl;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,16 +23,33 @@ public class TaskService {
 
     private final TaskRepositoryImpl taskRepository;
     private final TaskMapper taskMapper;
+    private final String cleanRate = "600000"; //10 mins
 
+
+    @Cacheable("tasks")
     public Flux<Task> getAllTask() {
         return taskRepository.findAll();
     }
 
+    @CacheEvict(value = "tasks", allEntries = true)
+    @Scheduled(fixedRateString = cleanRate)
+    public void emptyTasksCache() {
+        log.info("Emptying Tasks cache");
+    }
+
+    @Cacheable("task")
     public Mono<Task> findByTaskId(Long taskId) {
         return taskRepository.findById(taskId);
     }
 
+    @CacheEvict(value = "task", allEntries = true)
+    @Scheduled(fixedRateString = cleanRate)
+    public void emptyTaskCache() {
+        log.info("Emptying Task cache");
+    }
+
     public Mono<Void> deleteTask(Long taskId) {
+        log.info("Delete task by id " + taskId);
         return findByTaskId(taskId)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
@@ -43,8 +61,8 @@ public class TaskService {
                 });
     }
 
-    @Transactional(propagation = Propagation.NEVER)
-    public synchronized Mono<Task> refreshById(Long taskId, TaskDto taskDto) {
+    public Mono<Task> refreshById(Long taskId, TaskDto taskDto) {
+        log.info("Refresh task by id " + taskId);
         return findByTaskId(taskId)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
@@ -57,10 +75,12 @@ public class TaskService {
     }
 
     public Mono<Task> findByTitle(String title) {
+        log.info("Find task by title " + title);
         return taskRepository.findByTitle(title);
     }
 
     public Mono<Task> createTask(TaskDto taskDto) {
+        log.info("Create new task");
         return findByTitle(taskDto.getTitle())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
