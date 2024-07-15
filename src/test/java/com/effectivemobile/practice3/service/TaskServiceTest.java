@@ -3,7 +3,7 @@ package com.effectivemobile.practice3.service;
 import com.effectivemobile.practice3.mapper.TaskMapper;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.repository.impl.TaskRepositoryImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class TaskServiceTest {
 
     @Mock
-    TaskRepository taskRepository;
+    TaskRepositoryImpl taskRepository;
     @Mock
     TaskMapper taskMapper;
 
@@ -80,8 +80,7 @@ class TaskServiceTest {
     void refreshTaskById_returnTask() {
         //mock
         when(taskRepository.findById(1L)).thenReturn(Mono.just(task));
-        when(taskRepository.save(task)).thenReturn(Mono.just(task));
-        when(taskMapper.toEntityTask(taskDto)).thenReturn(task);
+        when(taskRepository.updateById(1L, taskDto)).thenReturn(Mono.just(task));
 
         //when
         Mono<Task> taskMono = taskService.refreshById(1L, taskDto);
