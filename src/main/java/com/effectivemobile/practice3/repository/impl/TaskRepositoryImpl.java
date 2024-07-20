@@ -29,7 +29,7 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
         lockTitle.writeLock().lock();
         try {
             return this.databaseClient
-                    .sql("SELECT * FROM rest.public.task WHERE title=:title")
+                    .sql("SELECT * FROM task WHERE title=:title")
                     .bind("title", title)
                     .map(MAPPING_FUNCTION)
                     .one();
@@ -43,7 +43,7 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     public Mono<Task> save(Task task) {
         lockTitle.writeLock().lock();
         try {
-            return this.databaseClient.sql("INSERT INTO  rest.public.task (title, description) VALUES (:title, :description)")
+            return this.databaseClient.sql("INSERT INTO  task (title, description) VALUES (:title, :description)")
                     .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
                     .bind("title", task.getTitle())
                     .bind("description", task.getDescription())
@@ -58,7 +58,7 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     @Override
     public Mono<Void> deleteById(Long id) {
         return this.databaseClient
-                .sql("DELETE FROM rest.public.task WHERE id=:id")
+                .sql("DELETE FROM task WHERE id=:id")
                 .bind("id", id)
                 .then();
     }
@@ -68,7 +68,7 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
         lockId.readLock().lock();
         try {
             return this.databaseClient
-                    .sql("SELECT * FROM rest.public.task WHERE id=:id")
+                    .sql("SELECT * FROM task WHERE id=:id")
                     .bind("id", id)
                     .map(MAPPING_FUNCTION)
                     .one();
@@ -81,17 +81,23 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     @Override
     public Flux<Task> findAll() {
         return this.databaseClient
-                .sql("SELECT * FROM rest.public.task")
+                .sql("SELECT * FROM task")
                 .filter((statement, executeFunction) -> statement.fetchSize(10).execute())
                 .map(MAPPING_FUNCTION)
                 .all();
+    }
+
+    public Mono<Void> deleteAll() {
+        return this.databaseClient
+                .sql("DELETE FROM task")
+                .then();
     }
 
     @Override
     public Mono<Task> updateById(Long id, TaskDto taskDto) {
         lockId.writeLock().lock();
         try {
-            return this.databaseClient.sql("UPDATE rest.public.task set title=:title, description=:description WHERE id=:id")
+            return this.databaseClient.sql("UPDATE task set title=:title, description=:description WHERE id=:id")
                     .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
                     .bind("title", taskDto.getTitle())
                     .bind("description", taskDto.getDescription())
