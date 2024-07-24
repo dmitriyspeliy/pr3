@@ -6,6 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles(profiles = {"test"})
+// need connect to db
 class Practice3ApplicationTests {
 
 	@Test
