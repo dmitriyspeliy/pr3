@@ -90,7 +90,7 @@ public class TaskService {
             newTask = new TaskDto();
             newTask.setDescription(taskDto.getDescription());
             newTask.setTitle(taskDto.getTitle());
-            return taskMapper.toDtoTask(taskRepository.save(taskMapper.toEntityTask(newTask)));
+            return taskMapper.toDtoTask(taskRepository.save(taskMapper.toEntityTask(newTask)).get());
         }
         throw new BadRequestException("Task exist in db");
     }

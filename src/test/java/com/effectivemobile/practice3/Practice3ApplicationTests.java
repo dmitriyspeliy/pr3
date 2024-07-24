@@ -2,15 +2,16 @@ package com.effectivemobile.practice3;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootTest
-@ActiveProfiles(profiles = {"test"})
-// need connect to db
+@EnableCaching
+@EnableScheduling
 class Practice3ApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

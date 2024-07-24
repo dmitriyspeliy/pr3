@@ -103,7 +103,7 @@ class TaskServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.ofNullable(task));
         when(taskMapper.toDtoTask(task)).thenReturn(taskDto);
         when(taskMapper.toEntityTask(taskDto)).thenReturn(task);
-        when(taskRepository.save(task)).thenReturn(task);
+        when(taskRepository.save(task)).thenReturn(Optional.ofNullable(task));
 
         //when
         TaskDto task1 = taskService.refreshById(1L, taskDto);
@@ -180,7 +180,7 @@ class TaskServiceTest {
         when(taskRepository.findByTitle(anyString())).thenReturn(Optional.empty());
         when(taskMapper.toEntityTask(any(TaskDto.class))).thenReturn(task);
         when(taskMapper.toDtoTask(any(Task.class))).thenReturn(taskDto);
-        when(taskRepository.save(any(Task.class))).thenReturn(task);
+        when(taskRepository.save(any(Task.class))).thenReturn(Optional.ofNullable(task));
 
         //when
         TaskDto taskDto1 = taskService.createTask(taskDto);

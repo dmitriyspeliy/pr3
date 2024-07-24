@@ -72,7 +72,7 @@ class TaskControllerImplTestIT extends ConfigDB {
     @DisplayName(value = "3. Update task in db")
     void updateById_ReturnTask() throws BadRequestException {
         taskRepository.deleteAll();
-        Task task1 = taskRepository.save(task);
+        Task task1 = taskRepository.save(task).get();
         assertNotNull(task1);
         TaskDto taskNew =
                 taskController.update(task1.getId(),
@@ -86,7 +86,7 @@ class TaskControllerImplTestIT extends ConfigDB {
     @DisplayName(value = "4. Delete task in db")
     void deleteTaskById_ReturnTask() throws BadRequestException {
         taskRepository.deleteAll();
-        Task task1 = taskRepository.save(task);
+        Task task1 = taskRepository.save(task).get();
         assertNotNull(task1);
         taskController.deleteTaskById(task1.getId());
         Optional<Task> find = taskRepository.findById(task.getId());
