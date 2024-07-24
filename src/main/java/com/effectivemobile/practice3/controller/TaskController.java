@@ -2,6 +2,7 @@ package com.effectivemobile.practice3.controller;
 
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
+import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import com.effectivemobile.practice3.utils.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,11 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Tag(name = "TODO controller", description = "Controller with simple rest methods")
 @Validated
@@ -43,7 +43,7 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    ResponseEntity<Mono<Task>> create(@Parameter(description = "Body task") @Valid TaskDto taskDto);
+    ResponseEntity<TaskDto> create(@Parameter(description = "Body task") @Valid TaskDto taskDto) throws BadRequestException;
 
     @Operation(
             summary = "Get all task",
@@ -52,7 +52,7 @@ public interface TaskController {
                             description = "Get array with task",
                             responseCode = "200",
                             content = {@Content(mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = Flux.class)))}
+                                    array = @ArraySchema(schema = @Schema(implementation = Task.class)))}
                     ),
                     @ApiResponse(
                             responseCode = "5XX",
@@ -61,7 +61,7 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    Flux<Task> getAllTask();
+    List<TaskDto> getAllTask();
 
     @Operation(
             summary = "Refresh task by id",
@@ -84,8 +84,8 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    ResponseEntity<Mono<Task>> update(@Parameter(description = "Task's id") @Min(1) Long id,
-                                      @Parameter(description = "Body task") @Valid TaskDto taskDto);
+    ResponseEntity<TaskDto> update(@Parameter(description = "Task's id") @Min(1) Long id,
+                                @Parameter(description = "Body task") @Valid TaskDto taskDto) throws BadRequestException;
 
     @Operation(
             summary = "Delete task by id",
@@ -108,5 +108,5 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    Mono<Void> deleteTaskById(@Parameter(description = "Task's id") @Min(1) Long id);
+    void deleteTaskById(@Parameter(description = "Task's id") @Min(1) Long id) throws BadRequestException;
 }

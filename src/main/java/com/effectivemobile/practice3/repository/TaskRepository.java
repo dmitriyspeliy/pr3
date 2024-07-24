@@ -1,22 +1,10 @@
 package com.effectivemobile.practice3.repository;
 
-import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TaskRepository<T> {
+import java.util.Optional;
 
-    Mono<T> findByTitle(String title);
-
-    Mono<T> save(T task);
-
-    Mono<Void> deleteById(Long id);
-
-    Mono<T> findById(Long id);
-
-    Flux<T> findAll();
-
-    Mono<Task> updateById(Long id, TaskDto taskDto);
-
+public interface TaskRepository extends JpaRepository<Task, Long> {
+    Optional<Task> findByTitle(String title);
 }

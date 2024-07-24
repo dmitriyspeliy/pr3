@@ -4,11 +4,11 @@ spring:
     show-sql: true
   banner:
     location: banner.txt
-  r2dbc:
-    url: ${HOST_DB:r2dbc:postgresql://localhost:5432/rest}
-    username: ${DB_USER:admin}
-    password: ${DB_USER:admin}
-  flyway:
+  datasource:
     url: ${HOST_DB:jdbc:postgresql://localhost:5432/rest}
+    username: ${DB_USER:admin}
+    password: ${DB_PASS:admin}
+    driver-class-name: org.postgresql.Driver
+  flyway:
     baselineOnMigrate: true
     enabled: true

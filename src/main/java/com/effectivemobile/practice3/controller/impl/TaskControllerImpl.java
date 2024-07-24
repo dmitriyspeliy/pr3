@@ -3,13 +3,13 @@ package com.effectivemobile.practice3.controller.impl;
 
 import com.effectivemobile.practice3.controller.TaskController;
 import com.effectivemobile.practice3.model.dto.TaskDto;
-import com.effectivemobile.practice3.model.entity.Task;
 import com.effectivemobile.practice3.service.TaskService;
+import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,25 +20,25 @@ public class TaskControllerImpl implements TaskController {
 
     @Override
     @PostMapping
-    public ResponseEntity<Mono<Task>> create(@RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> create(@RequestBody TaskDto taskDto) throws BadRequestException {
         return ResponseEntity.ok(taskService.createTask(taskDto));
     }
 
     @GetMapping
-    public Flux<Task> getAllTask() {
+    public List<TaskDto> getAllTask() {
         return taskService.getAllTask();
     }
 
     @Override
     @PostMapping("/update/{id}")
-    public ResponseEntity<Mono<Task>> update(@PathVariable(name = "id") Long id,
-                                             @RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> update(@PathVariable(name = "id") Long id,
+                                          @RequestBody TaskDto taskDto) throws BadRequestException {
         return ResponseEntity.ok(taskService.refreshById(id, taskDto));
     }
 
     @Override
     @GetMapping("{id}")
-    public Mono<Void> deleteTaskById(@PathVariable(name = "id") Long id) {
-        return taskService.deleteTask(id);
+    public void deleteTaskById(@PathVariable(name = "id") Long id) throws BadRequestException {
+        taskService.deleteTask(id);
     }
 }

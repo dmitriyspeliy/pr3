@@ -3,12 +3,12 @@ package com.effectivemobile.practice3.controller.impl;
 import com.effectivemobile.practice3.configDB_IT.ConfigDB;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.impl.TaskRepositoryImpl;
+import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +19,7 @@ class TaskControllerImplTestIT extends ConfigDB {
     private static final String UPDATE = "/v1/api/update/";
 
     @Autowired
-    private TaskRepositoryImpl taskRepository;
+    private TaskRepository taskRepository;
     @Autowired
     private TaskControllerImpl taskController;
 
@@ -32,8 +32,8 @@ class TaskControllerImplTestIT extends ConfigDB {
     void setUp() {
         task = new Task();
         task.setId(1L);
-        task.setTitle("TEST TITLE");
-        task.setDescription("TEST DESCR");
+        task.setTitle("new");
+        task.setDescription("new");
 
         taskDto1 = new TaskDto();
         taskDto1.setTitle("new");
@@ -53,43 +53,43 @@ class TaskControllerImplTestIT extends ConfigDB {
 
     @Test
     @DisplayName(value = "1. Create task in db")
-    void createTask_returnTask() {
+    void createTask_returnTask() throws BadRequestException {
+        taskRepository.deleteAll();
         taskController.create(taskDto);
-        assertEquals(0, taskRepository.findAll().collectList().map(List::size).block());
+        assertEquals(1, taskRepository.findAll().size());
     }
 
 
     @Test
     @DisplayName(value = "2. Get list task")
-    void getAllTask_ReturnAllTask() {
-        taskRepository.deleteAll().block();
-        Task task1 = Objects.requireNonNull(taskController.create(taskDto).getBody()).block();
-        Task task2 = Objects.requireNonNull(taskController.create(taskDto1).getBody()).block();
-        assertEquals(2, taskRepository.findAll().collectList().map(List::size).block());
+    void getAllTask_ReturnAllTask() throws BadRequestException {
+        taskRepository.deleteAll();
+        TaskDto task1 = taskController.create(taskDto).getBody();
+        assertEquals(1, taskRepository.findAll().size());
     }
 
     @Test
     @DisplayName(value = "3. Update task in db")
-    void updateById_ReturnTask() {
-        taskRepository.deleteAll().block();
-        Task task = Objects.requireNonNull(taskController.create(taskDto).getBody()).block();
-        assertNotNull(task);
-        Task taskNew =
-                Objects.requireNonNull(taskController.update(task.getId(),
-                        TaskDto.builder().title("new").description("new").build()).getBody()).block();
+    void updateById_ReturnTask() throws BadRequestException {
+        taskRepository.deleteAll();
+        Task task1 = taskRepository.save(task);
+        assertNotNull(task1);
+        TaskDto taskNew =
+                taskController.update(task1.getId(),
+                        TaskDto.builder().title("new1").description("new1").build()).getBody();
         assertNotNull(taskNew);
-        assertEquals("new", taskNew.getDescription());
-        assertEquals("new", taskNew.getTitle());
+        assertEquals("new1", taskNew.getDescription());
+        assertEquals("new1", taskNew.getTitle());
     }
 
     @Test
     @DisplayName(value = "4. Delete task in db")
-    void deleteTaskById_ReturnTask() {
-        taskRepository.deleteAll().block();
-        Task task = Objects.requireNonNull(taskController.create(taskDto).getBody()).block();
-        assertNotNull(task);
-        taskController.deleteTaskById(task.getId()).block();
-        Task find = taskRepository.findById(task.getId()).block();
-        assertNull(find);
+    void deleteTaskById_ReturnTask() throws BadRequestException {
+        taskRepository.deleteAll();
+        Task task1 = taskRepository.save(task);
+        assertNotNull(task1);
+        taskController.deleteTaskById(task1.getId());
+        Optional<Task> find = taskRepository.findById(task.getId());
+        assertTrue(find.isEmpty());
     }
 }

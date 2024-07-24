@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   postgres:
-    image: postgres:14.8-alpine3.18
+    image: postgres:latest
     environment:
       POSTGRES_DB: "rest"
       POSTGRES_USER: "admin"
@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
   postgres-test:
-    image: postgres:14.8-alpine3.18
+    image: postgres:latest
     environment:
       POSTGRES_DB: "rest-test"
       POSTGRES_USER: "admin"
