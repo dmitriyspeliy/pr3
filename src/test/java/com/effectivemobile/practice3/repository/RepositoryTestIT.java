@@ -14,14 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class RepositoryTestIT extends ConfigDB {
 
     @Autowired
-    private TaskRepository taskRepository;
+    private TaskRepositoryImpl taskRepository;
 
     @DisplayName(value = "Smoke test")
     @Test
     void saveInDB_returnTask() throws BadRequestException {
         assertNotNull(taskRepository);
         taskRepository.deleteAll();
-        Task taskNew = taskRepository.save(Task.builder().title("test").description("test").build()).get();
+        Task task1 = new Task();
+        task1.setTitle("test");
+        task1.setDescription("test");
+        Task taskNew = taskRepository.save(task1).get();
         assertEquals(1L, taskNew.getId());
     }
 

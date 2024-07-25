@@ -3,7 +3,7 @@ package com.effectivemobile.practice3.service;
 import com.effectivemobile.practice3.mapper.TaskMapper;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.repository.TaskRepositoryImpl;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class TaskServiceTest {
 
     @Mock
-    TaskRepository taskRepository;
+    TaskRepositoryImpl taskRepository;
     @Mock
     TaskMapper taskMapper;
 

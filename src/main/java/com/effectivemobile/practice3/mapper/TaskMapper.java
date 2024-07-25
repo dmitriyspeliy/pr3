@@ -11,17 +11,17 @@ import java.util.stream.Collectors;
 public class TaskMapper {
 
     public Task toEntityTask(TaskDto taskDto) {
-        return Task.builder()
-                .title(taskDto.getTitle())
-                .description(taskDto.getDescription())
-                .build();
+        Task task = new Task();
+        task.setTitle(taskDto.getTitle());
+        task.setDescription(taskDto.getDescription());
+        return task;
     }
 
     public TaskDto toDtoTask(Task task) {
-        return TaskDto.builder()
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .build();
+        TaskDto taskDto = new TaskDto();
+        taskDto.setTitle(task.getTitle());
+        taskDto.setDescription(task.getDescription());
+        return taskDto;
     }
 
     public List<TaskDto> taskDtoList(List<Task> taskList) {

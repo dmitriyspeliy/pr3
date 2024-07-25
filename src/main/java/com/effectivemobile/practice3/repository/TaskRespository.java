@@ -5,7 +5,7 @@ import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import java.util.List;
 import java.util.Optional;
 
-public interface TaskJdbcTemplate<T> {
+public interface TaskRespository<T> {
 
     Optional<T> findByTitle(String title);
 

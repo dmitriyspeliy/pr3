@@ -5,18 +5,20 @@ import com.effectivemobile.practice3.controller.TaskController;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.service.TaskService;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/v1/api")
 public class TaskControllerImpl implements TaskController {
 
     private final TaskService taskService;
+
+    public TaskControllerImpl(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @Override
     @PostMapping

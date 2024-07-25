@@ -3,10 +3,8 @@ package com.effectivemobile.practice3.service;
 import com.effectivemobile.practice3.mapper.TaskMapper;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.repository.TaskRepositoryImpl;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,15 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class TaskService {
 
-    private final TaskRepository taskRepository;
+    private final TaskRepositoryImpl taskRepository;
     private final TaskMapper taskMapper;
     private final String cleanRate = "600000"; //10 mins
+    private final Logger log = Logger.getLogger(TaskService.class.getName());
+
+
+    public TaskService(TaskRepositoryImpl taskRepository, TaskMapper taskMapper) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+    }
 
 
     @Cacheable("tasks")
@@ -60,7 +64,6 @@ public class TaskService {
         taskRepository.deleteById(taskId);
     }
 
-    @Transactional
     public TaskDto refreshById(Long taskId, TaskDto taskDto) throws BadRequestException {
         log.info("Refresh task by id " + taskId);
         TaskDto newTask = findByTaskId(taskId);
@@ -80,7 +83,6 @@ public class TaskService {
         }
     }
 
-    @Transactional
     public TaskDto createTask(TaskDto taskDto) throws BadRequestException {
         log.info("Create new task");
         TaskDto newTask;

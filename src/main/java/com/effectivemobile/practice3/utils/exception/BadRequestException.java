@@ -1,14 +1,19 @@
 package com.effectivemobile.practice3.utils.exception;
 
-import lombok.Getter;
-
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-@Getter
 public class BadRequestException extends Exception {
 
     private final String textException;
     private final String code;
+
+    public String getTextException() {
+        return textException;
+    }
+
+    public String getCode() {
+        return code;
+    }
 
     public BadRequestException(String textException) {
         this.textException = textException;

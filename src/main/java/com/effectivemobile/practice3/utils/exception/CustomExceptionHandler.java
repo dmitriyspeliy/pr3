@@ -22,10 +22,7 @@ public class CustomExceptionHandler {
     public final ResponseEntity<ErrorResponse> badRequestException(BadRequestException ex) {
         return ResponseEntity
                 .status(BAD_REQUEST)
-                .body(ErrorResponse.builder()
-                        .message(ex.getTextException())
-                        .code(ex.getCode())
-                        .build());
+                .body(new ErrorResponse(ex.getTextException(), ex.getCode()));
     }
 
     /**
@@ -35,10 +32,7 @@ public class CustomExceptionHandler {
     public final ResponseEntity<ErrorResponse> elemNotFound(ElemNotFound ex) {
         return ResponseEntity
                 .status(NOT_FOUND)
-                .body(ErrorResponse.builder()
-                        .message(ex.getTextException())
-                        .code(ex.getCode())
-                        .build());
+                .body(new ErrorResponse(ex.getTextException(), ex.getCode()));
     }
 
 
@@ -50,10 +44,7 @@ public class CustomExceptionHandler {
     public final ResponseEntity<ErrorResponse> invalidParam() {
         return ResponseEntity
                 .status(BAD_REQUEST)
-                .body(ErrorResponse.builder()
-                        .message("Invalid param or method does not exist")
-                        .code(String.valueOf(BAD_REQUEST.value()))
-                        .build());
+                .body(new ErrorResponse("Invalid param or method does not exist", String.valueOf(BAD_REQUEST.value())));
     }
 
 }

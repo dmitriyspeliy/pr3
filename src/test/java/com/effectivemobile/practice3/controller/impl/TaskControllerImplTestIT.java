@@ -3,7 +3,7 @@ package com.effectivemobile.practice3.controller.impl;
 import com.effectivemobile.practice3.configDB_IT.ConfigDB;
 import com.effectivemobile.practice3.model.dto.TaskDto;
 import com.effectivemobile.practice3.model.entity.Task;
-import com.effectivemobile.practice3.repository.TaskRepository;
+import com.effectivemobile.practice3.repository.TaskRepositoryImpl;
 import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ class TaskControllerImplTestIT extends ConfigDB {
     private static final String UPDATE = "/v1/api/update/";
 
     @Autowired
-    private TaskRepository taskRepository;
+    private TaskRepositoryImpl taskRepository;
     @Autowired
     private TaskControllerImpl taskController;
 
@@ -74,9 +74,11 @@ class TaskControllerImplTestIT extends ConfigDB {
         taskRepository.deleteAll();
         Task task1 = taskRepository.save(task).get();
         assertNotNull(task1);
+        TaskDto taskDto2 = new TaskDto();
+        taskDto2.setDescription("new1");
+        taskDto2.setTitle("new1");
         TaskDto taskNew =
-                taskController.update(task1.getId(),
-                        TaskDto.builder().title("new1").description("new1").build()).getBody();
+                taskController.update(task1.getId(), taskDto2).getBody();
         assertNotNull(taskNew);
         assertEquals("new1", taskNew.getDescription());
         assertEquals("new1", taskNew.getTitle());
