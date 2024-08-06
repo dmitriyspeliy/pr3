@@ -2,10 +2,10 @@ package com.effectivemobile.practice3.utils.exception;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,8 +13,8 @@ import lombok.experimental.FieldDefaults;
 public class ErrorResponse {
     @Schema(description = "Сообщение об ошибке")
     @JsonProperty("message")
-    String message;
+    private String message;
     @Schema(description = "Код ошибки")
     @JsonProperty("code")
-    String code;
+    private String code;
 }

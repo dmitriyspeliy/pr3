@@ -5,17 +5,17 @@ import lombok.Getter;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Getter
-public class ElemNotFound extends Exception {
+public class ElementNotFound extends Exception {
 
     private final String textException;
     private final String code;
 
-    public ElemNotFound(String textException) {
+    public ElementNotFound(String textException) {
         this.textException = textException;
         this.code = String.valueOf(BAD_REQUEST.value());
     }
 
-    public ElemNotFound(String textException, String code) {
+    public ElementNotFound(String textException, String code) {
         this.textException = textException;
         this.code = code;
     }

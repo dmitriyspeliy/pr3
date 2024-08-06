@@ -11,9 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -43,7 +42,7 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    ResponseEntity<Mono<Task>> create(@Parameter(description = "Body task") @Valid TaskDto taskDto);
+    Mono<Task> create(@Parameter(description = "Body task") @Valid TaskDto taskDto);
 
     @Operation(
             summary = "Get all task",
@@ -61,7 +60,8 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    Flux<Task> getAllTask();
+    Flux<Task> getAllTask(@Parameter(description = "Limit", example = "10") @Min(1) @Max(10) Integer limit,
+                          @Parameter(description = "Number of page", example = "1") @Min(1) Integer numberOfPage);
 
     @Operation(
             summary = "Refresh task by id",
@@ -84,8 +84,8 @@ public interface TaskController {
                                     array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)))})
             }
     )
-    ResponseEntity<Mono<Task>> update(@Parameter(description = "Task's id") @Min(1) Long id,
-                                      @Parameter(description = "Body task") @Valid TaskDto taskDto);
+    Mono<Task> update(@Parameter(description = "Task's id") @Min(1) Long id,
+                      @Parameter(description = "Body task") @Valid TaskDto taskDto);
 
     @Operation(
             summary = "Delete task by id",

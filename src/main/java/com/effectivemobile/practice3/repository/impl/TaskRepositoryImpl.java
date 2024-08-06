@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 
 @Service
@@ -20,39 +18,25 @@ import java.util.function.BiFunction;
 public class TaskRepositoryImpl implements TaskRepository<Task> {
 
     private final DatabaseClient databaseClient;
-    private final ReadWriteLock lockId = new ReentrantReadWriteLock();
-    private final ReadWriteLock lockTitle = new ReentrantReadWriteLock();
-
 
     @Override
     public Mono<Task> findByTitle(String title) {
-        lockTitle.writeLock().lock();
-        try {
-            return this.databaseClient
-                    .sql("SELECT * FROM task WHERE title=:title")
-                    .bind("title", title)
-                    .map(MAPPING_FUNCTION)
-                    .one();
-        } finally {
-            lockTitle.writeLock().unlock();
-        }
+        return this.databaseClient
+                .sql("SELECT * FROM task WHERE title=:title")
+                .bind("title", title)
+                .map(MAPPING_FUNCTION)
+                .one();
 
     }
 
     @Override
     public Mono<Task> save(Task task) {
-        lockTitle.writeLock().lock();
-        try {
-            return this.databaseClient.sql("INSERT INTO  task (title, description) VALUES (:title, :description)")
-                    .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
-                    .bind("title", task.getTitle())
-                    .bind("description", task.getDescription())
-                    .map(MAPPING_FUNCTION)
-                    .one();
-        } finally {
-            lockTitle.writeLock().unlock();
-        }
-
+        return this.databaseClient.sql("INSERT INTO  task (title, description) VALUES (:title, :description)")
+                .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
+                .bind("title", task.getTitle())
+                .bind("description", task.getDescription())
+                .map(MAPPING_FUNCTION)
+                .one();
     }
 
     @Override
@@ -65,23 +49,17 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
 
     @Override
     public Mono<Task> findById(Long id) {
-        lockId.readLock().lock();
-        try {
-            return this.databaseClient
-                    .sql("SELECT * FROM task WHERE id=:id")
-                    .bind("id", id)
-                    .map(MAPPING_FUNCTION)
-                    .one();
-        } finally {
-            lockId.readLock().unlock();
-        }
-
+        return this.databaseClient
+                .sql("SELECT * FROM task WHERE id=:id")
+                .bind("id", id)
+                .map(MAPPING_FUNCTION)
+                .one();
     }
 
     @Override
-    public Flux<Task> findAll() {
+    public Flux<Task> findAll(Integer limit, Integer offset) {
         return this.databaseClient
-                .sql("SELECT * FROM task")
+                .sql("SELECT * FROM task limit " + limit + " offset " + offset)
                 .filter((statement, executeFunction) -> statement.fetchSize(10).execute())
                 .map(MAPPING_FUNCTION)
                 .all();
@@ -95,19 +73,13 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
 
     @Override
     public Mono<Task> updateById(Long id, TaskDto taskDto) {
-        lockId.writeLock().lock();
-        try {
-            return this.databaseClient.sql("UPDATE task set title=:title, description=:description WHERE id=:id")
-                    .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
-                    .bind("title", taskDto.getTitle())
-                    .bind("description", taskDto.getDescription())
-                    .bind("id", id)
-                    .map(MAPPING_FUNCTION)
-                    .one();
-        } finally {
-            lockId.writeLock().unlock();
-
-        }
+        return this.databaseClient.sql("UPDATE task set title=:title, description=:description WHERE id=:id")
+                .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
+                .bind("title", taskDto.getTitle())
+                .bind("description", taskDto.getDescription())
+                .bind("id", id)
+                .map(MAPPING_FUNCTION)
+                .one();
     }
 
     public static final BiFunction<Row, RowMetadata, Task> MAPPING_FUNCTION = (row, rowMetaData) -> Task.builder()

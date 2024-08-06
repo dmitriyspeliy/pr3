@@ -8,9 +8,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "spring.r2dbc")
 public class PostgresCredentials {
-
-    String username;
-    String password;
-
+    private String username;
+    private String password;
+    private String host;
+    private Integer port;
+    private String databaseName;
 }
 

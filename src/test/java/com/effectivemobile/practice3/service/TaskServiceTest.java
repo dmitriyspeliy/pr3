@@ -54,10 +54,10 @@ class TaskServiceTest {
     @DisplayName(value = "1. Positive test. Method getAllTask()")
     void getAllTask_returnAllTask() {
         //mock
-        when(taskRepository.findAll()).thenReturn(Flux.just(task));
+        when(taskRepository.findAll(10, 0)).thenReturn(Flux.just(task));
 
         //when
-        StepVerifier.create(taskService.getAllTask())
+        StepVerifier.create(taskService.getAllTask(10, 1))
                 //then
                 .expectNext(task)
                 .verifyComplete();
@@ -131,21 +131,6 @@ class TaskServiceTest {
         StepVerifier.create(taskService.deleteTask(1L))
                 //then
                 .expectError().verify();
-    }
-
-
-    @Test
-    @DisplayName(value = "7. Positive test. Method findByTitle()")
-    void findByTitle_returnTask() {
-        //mock
-        when(taskRepository.findByTitle(task.getTitle())).thenReturn(Mono.just(task));
-
-        //when
-        StepVerifier.create(taskService.findByTitle(task.getTitle()))
-                //then
-                .expectNext(task)
-                .verifyComplete();
-
     }
 
     @Test

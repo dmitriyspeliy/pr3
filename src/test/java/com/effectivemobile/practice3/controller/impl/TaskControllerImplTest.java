@@ -97,7 +97,7 @@ class TaskControllerImplTest {
     @Test
     @DisplayName(value = "3. Positive test. Method getAllTask()")
     void getAllTask_ReturnAllTask() {
-        Mockito.when(taskService.getAllTask()).thenReturn(Flux.just(task));
+        Mockito.when(taskService.getAllTask(10, 1)).thenReturn(Flux.just(task));
 
         webTestClient.get()
                 .uri(API_PATH)
@@ -112,7 +112,7 @@ class TaskControllerImplTest {
 
         Mockito.when(taskService.refreshById(1L, taskDto)).thenReturn(Mono.just(task));
 
-        webTestClient.post()
+        webTestClient.put()
                 .uri(UPDATE + 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ class TaskControllerImplTest {
 
         Mockito.when(taskService.deleteTask(1L)).thenReturn(Mono.empty());
 
-        webTestClient.get()
+        webTestClient.delete()
                 .uri(API_PATH + "/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

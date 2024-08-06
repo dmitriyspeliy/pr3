@@ -31,8 +31,8 @@ public class CustomExceptionHandler {
     /**
      * 404
      */
-    @ExceptionHandler(ElemNotFound.class)
-    public final ResponseEntity<ErrorResponse> elemNotFound(ElemNotFound ex) {
+    @ExceptionHandler(ElementNotFound.class)
+    public final ResponseEntity<ErrorResponse> elemNotFound(ElementNotFound ex) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(ErrorResponse.builder()

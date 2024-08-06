@@ -39,9 +39,9 @@ public class DatabaseConfig {
         // postgres
         return new PostgresqlConnectionFactory(
                 PostgresqlConnectionConfiguration.builder()
-                        .host("localhost")
-                        .port(5432)
-                        .database("rest")
+                        .host(postgresCredentials.getHost())
+                        .port(postgresCredentials.getPort())
+                        .database(postgresCredentials.getDatabaseName())
                         .username(postgresCredentials.getUsername())
                         .password(postgresCredentials.getPassword())
                         .build()

@@ -27,8 +27,10 @@ public class TaskService {
 
 
     @Cacheable("tasks")
-    public Flux<Task> getAllTask() {
-        return taskRepository.findAll();
+    public Flux<Task> getAllTask(Integer limit, Integer pageOfNumber) {
+        log.info("Find all with limit " + limit + " and numberOfPage " + pageOfNumber);
+        Integer offset = (pageOfNumber - 1) * limit;
+        return taskRepository.findAll(limit, offset);
     }
 
     @CacheEvict(value = "tasks", allEntries = true)
@@ -48,6 +50,7 @@ public class TaskService {
         log.info("Emptying Task cache");
     }
 
+    @CacheEvict(value = "task", key = "#taskId")
     public Mono<Void> deleteTask(Long taskId) {
         log.info("Delete task by id " + taskId);
         return findByTaskId(taskId)
@@ -74,14 +77,9 @@ public class TaskService {
                 });
     }
 
-    public Mono<Task> findByTitle(String title) {
-        log.info("Find task by title " + title);
-        return taskRepository.findByTitle(title);
-    }
-
     public Mono<Task> createTask(TaskDto taskDto) {
         log.info("Create new task");
-        return findByTitle(taskDto.getTitle())
+        return taskRepository.findByTitle(taskDto.getTitle())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
                 .flatMap(optionalTutorial -> {

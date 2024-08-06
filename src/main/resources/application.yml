@@ -5,10 +5,13 @@ spring:
   banner:
     location: banner.txt
   r2dbc:
-    url: ${HOST_DB:r2dbc:postgresql://localhost:5432/rest}
-    username: ${DB_USER:admin}
-    password: ${DB_USER:admin}
+    url: ${HOST_DB}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    port: ${DB_PORT}
+    host: ${DB_HOST}
+    databaseName: ${DB_NAME}
   flyway:
-    url: ${HOST_DB:jdbc:postgresql://localhost:5432/rest}
+    url: ${HOST_DB}
     baselineOnMigrate: true
     enabled: true

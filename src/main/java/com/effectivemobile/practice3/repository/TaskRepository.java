@@ -15,7 +15,7 @@ public interface TaskRepository<T> {
 
     Mono<T> findById(Long id);
 
-    Flux<T> findAll();
+    Flux<T> findAll(Integer limit, Integer offset);
 
     Mono<Task> updateById(Long id, TaskDto taskDto);
 
