@@ -14,6 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @DataR2dbcTest
 @AutoConfigureCache
+@DirtiesContext
 @ComponentScan(basePackages = {"com.effectivemobile.practice3.repository","com.effectivemobile.practice3.service", "com.effectivemobile.practice3.mapper"
 ,"com.effectivemobile.practice3.controller"})
 public class ConfigDB {
