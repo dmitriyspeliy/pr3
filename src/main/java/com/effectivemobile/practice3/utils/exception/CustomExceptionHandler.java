@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -45,7 +46,10 @@ public class CustomExceptionHandler {
     /**
      * 400
      */
-    @ExceptionHandler(value = {MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class,
+    @ExceptionHandler(value = {
+            MethodNotAllowedException.class,
+            MethodArgumentNotValidException.class,
+            MethodArgumentTypeMismatchException.class,
             ConstraintViolationException.class})
     public final ResponseEntity<ErrorResponse> invalidParam() {
         return ResponseEntity
