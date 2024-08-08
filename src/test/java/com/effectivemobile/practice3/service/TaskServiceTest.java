@@ -82,7 +82,7 @@ class TaskServiceTest {
     void refreshTaskById_returnTask() {
         //mock
         when(taskRepository.findById(1L)).thenReturn(Mono.just(task));
-        when(taskRepository.updateById(1L, taskDto)).thenReturn(Mono.just(task));
+        when(taskRepository.updateById(1L, taskDto)).thenReturn(Mono.just(1L));
 
         //when
         Mono<Task> taskMono = taskService.refreshById(1L, taskDto);

@@ -8,7 +8,6 @@ import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -65,26 +64,31 @@ public class TaskService {
                 });
     }
 
-    @CachePut(value = "task", key = "#taskId")
     public Mono<Task> refreshById(Long taskId, TaskDto taskDto) {
         log.info("Refresh task by id " + taskId);
-        return findByTaskId(taskId)
+        return taskRepository.findByTitle(taskDto.getTitle())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
-                .flatMap(optionalTutorial -> {
-                    if (optionalTutorial.isPresent()) {
-                        return taskRepository.findByTitle(taskDto.getTitle())
+                .flatMap(optionalTitle -> {
+                    if (optionalTitle.isEmpty()) {
+                        return taskRepository.updateById(taskId, taskDto)
                                 .map(Optional::of)
                                 .defaultIfEmpty(Optional.empty())
-                                .flatMap(optionalTutorial1 -> {
-                                    if (optionalTutorial1.isEmpty()) {
-                                        return taskRepository.updateById(taskId, taskDto);
+                                .flatMap(longOptional -> {
+                                    if (longOptional.isPresent()) {
+                                        Task task = new Task();
+                                        task.setTitle(taskDto.getTitle());
+                                        task.setDescription(taskDto.getDescription());
+                                        task.setId(taskId);
+                                        return Mono.just(task);
                                     } else {
-                                        return Mono.error(new BadRequestException("Task wit title " + taskDto.getTitle() + " already exist!"));
+                                        return Mono.error(new BadRequestException("Couldn't find task by task id " + taskId));
                                     }
                                 });
+
+                    } else {
+                        return Mono.error(new BadRequestException("Task wit title " + taskDto.getTitle() + " already exist!"));
                     }
-                    return Mono.error(new BadRequestException("Couldn't find task by task id " + taskId));
                 });
     }
 

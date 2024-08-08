@@ -71,14 +71,12 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     }
 
     @Override
-    public Mono<Task> updateById(Long id, TaskDto taskDto) {
+    public Mono<Long> updateById(Long id, TaskDto taskDto) {
         return this.databaseClient.sql("UPDATE task set title=:title, description=:description WHERE id=:id")
-                .filter((statement, executeFunction) -> statement.returnGeneratedValues("id", "title", "description").execute())
                 .bind("title", taskDto.getTitle())
                 .bind("description", taskDto.getDescription())
                 .bind("id", id)
-                .map(MAPPING_FUNCTION)
-                .one();
+                .fetch().rowsUpdated();
     }
 
     public static final BiFunction<Row, RowMetadata, Task> MAPPING_FUNCTION = (row, rowMetaData) -> Task.builder()
