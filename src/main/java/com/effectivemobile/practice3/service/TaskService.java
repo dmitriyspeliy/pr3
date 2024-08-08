@@ -8,6 +8,7 @@ import com.effectivemobile.practice3.utils.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,7 @@ public class TaskService {
                 });
     }
 
+    @CachePut(value = "task", key = "#taskId")
     public Mono<Task> refreshById(Long taskId, TaskDto taskDto) {
         log.info("Refresh task by id " + taskId);
         return findByTaskId(taskId)
@@ -71,7 +73,16 @@ public class TaskService {
                 .defaultIfEmpty(Optional.empty())
                 .flatMap(optionalTutorial -> {
                     if (optionalTutorial.isPresent()) {
-                        return taskRepository.updateById(taskId, taskDto);
+                        return taskRepository.findByTitle(taskDto.getTitle())
+                                .map(Optional::of)
+                                .defaultIfEmpty(Optional.empty())
+                                .flatMap(optionalTutorial1 -> {
+                                    if (optionalTutorial1.isEmpty()) {
+                                        return taskRepository.updateById(taskId, taskDto);
+                                    } else {
+                                        return Mono.error(new BadRequestException("Task wit title " + taskDto.getTitle() + " already exist!"));
+                                    }
+                                });
                     }
                     return Mono.error(new BadRequestException("Couldn't find task by task id " + taskId));
                 });

@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/api")
+@RequestMapping("/api/v1")
 public class TaskControllerImpl implements TaskController {
 
     private final TaskService taskService;
@@ -31,7 +31,7 @@ public class TaskControllerImpl implements TaskController {
     }
 
     @Override
-    @PutMapping("/update/{id}")
+    @PutMapping("{id}")
     public Mono<Task> update(@PathVariable(name = "id") Long id,
                              @RequestBody TaskDto taskDto) {
         return taskService.refreshById(id, taskDto);

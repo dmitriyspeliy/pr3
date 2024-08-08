@@ -2,12 +2,16 @@ package com.effectivemobile.practice3.utils.exception;
 
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.MethodNotAllowedException;
+
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -44,18 +48,69 @@ public class CustomExceptionHandler {
 
 
     /**
+     * 405
+     */
+    @ExceptionHandler(MethodNotAllowedException.class)
+    public final ResponseEntity<ErrorResponse> methodNotAllowedException(MethodNotAllowedException ex) {
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(ErrorResponse.builder()
+                        .message(ex.getMessage())
+                        .code(ex.getStatusCode().toString())
+                        .build());
+    }
+
+    /**
      * 400
      */
-    @ExceptionHandler(value = {
-            MethodNotAllowedException.class,
-            MethodArgumentNotValidException.class,
-            MethodArgumentTypeMismatchException.class,
-            ConstraintViolationException.class})
-    public final ResponseEntity<ErrorResponse> invalidParam() {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(ErrorResponse.builder()
+                        .message(ex.getMessage())
+                        .code(ex.getStatusCode().toString())
+                        .build());
+    }
+
+    /**
+     * 400
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public final ResponseEntity<ErrorResponse> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(ErrorResponse.builder()
-                        .message("Invalid param or method does not exist")
+                        .message(ex.getMessage())
+                        .code(String.valueOf(BAD_REQUEST.value()))
+                        .build());
+    }
+
+
+    /**
+     * 400
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity<ErrorResponse> constraintViolationException(ConstraintViolationException ex) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ErrorResponse.builder()
+                        .message(ex.getMessage())
+                        .code(String.valueOf(BAD_REQUEST.value()))
+                        .build());
+    }
+
+    @ExceptionHandler(WebExchangeBindException.class)
+    public final ResponseEntity<ErrorResponse> webExchangeBindException(WebExchangeBindException ex) {
+        String resultMessage = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(";"));
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(ErrorResponse.builder()
+                        .message(resultMessage)
                         .code(String.valueOf(BAD_REQUEST.value()))
                         .build());
     }

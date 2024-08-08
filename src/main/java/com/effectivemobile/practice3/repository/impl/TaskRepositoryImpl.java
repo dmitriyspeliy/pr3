@@ -60,7 +60,6 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     public Flux<Task> findAll(Integer limit, Integer offset) {
         return this.databaseClient
                 .sql("SELECT * FROM task limit " + limit + " offset " + offset)
-                .filter((statement, executeFunction) -> statement.fetchSize(10).execute())
                 .map(MAPPING_FUNCTION)
                 .all();
     }
