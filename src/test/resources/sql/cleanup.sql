@@ -1,0 +1,1 @@
+delete from rest.public.task

@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +82,7 @@ class TaskServiceTest {
     @DisplayName(value = "3. Positive test. Method refreshById()")
     void refreshTaskById_returnTask() {
         //mock
-        when(taskRepository.findById(1L)).thenReturn(Mono.just(task));
+        when(taskRepository.findByTitle(taskDto.getTitle())).thenReturn(Mono.empty());
         when(taskRepository.updateById(1L, taskDto)).thenReturn(Mono.just(1L));
 
         //when
@@ -90,7 +91,11 @@ class TaskServiceTest {
         //when
         StepVerifier.create(taskMono)
                 //then
-                .expectNext(task)
+                .consumeNextWith((ex) -> {
+                    assertEquals(task.getTitle(), ex.getTitle());
+                    assertEquals(task.getDescription(), ex.getDescription());
+                    assertEquals(task.getId(), ex.getId());
+                })
                 .verifyComplete();
 
     }
@@ -99,7 +104,7 @@ class TaskServiceTest {
     @DisplayName(value = "4. Negative test. Method refreshById()")
     void refreshTaskById_taskNotExistInDb_returnException() {
         //mock
-        when(taskRepository.findById(1L)).thenReturn(Mono.empty());
+        when(taskRepository.findByTitle(taskDto.getTitle())).thenReturn(Mono.just(task));
 
         //when
         Mono<Task> taskMono = taskService.refreshById(1L, taskDto);
@@ -113,8 +118,7 @@ class TaskServiceTest {
     @DisplayName(value = "5. Positive test. Method deleteTaskById()")
     void deleteTaskById_returnTask() {
         //mock
-        when(taskRepository.findById(1L)).thenReturn(Mono.just(task));
-        when(taskRepository.deleteById(1L)).thenReturn(Mono.empty());
+        when(taskRepository.deleteById(1L)).thenReturn(Mono.just(1L));
 
         //when
         StepVerifier.create(taskService.deleteTask(1L))
@@ -126,7 +130,7 @@ class TaskServiceTest {
     @DisplayName(value = "6. Negative test. Method deleteTaskById()")
     void deleteTaskById_TaskNotExistById_returnException() {
         //mock
-        when(taskRepository.findById(1L)).thenReturn(Mono.empty());
+        when(taskRepository.deleteById(1L)).thenReturn(Mono.empty());
 
         StepVerifier.create(taskService.deleteTask(1L))
                 //then

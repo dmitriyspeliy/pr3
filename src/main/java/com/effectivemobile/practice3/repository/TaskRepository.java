@@ -10,7 +10,7 @@ public interface TaskRepository<T> {
 
     Mono<T> save(T task);
 
-    Mono<Void> deleteById(Long id);
+    Mono<Long> deleteById(Long id);
 
     Mono<T> findById(Long id);
 

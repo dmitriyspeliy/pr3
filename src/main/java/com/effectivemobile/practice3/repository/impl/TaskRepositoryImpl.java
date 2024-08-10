@@ -40,11 +40,11 @@ public class TaskRepositoryImpl implements TaskRepository<Task> {
     }
 
     @Override
-    public Mono<Void> deleteById(Long id) {
+    public Mono<Long> deleteById(Long id) {
         return this.databaseClient
                 .sql("DELETE FROM task WHERE id=:id")
                 .bind("id", id)
-                .then();
+                .fetch().rowsUpdated();
     }
 
     @Override

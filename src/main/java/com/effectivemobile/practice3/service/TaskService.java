@@ -53,14 +53,14 @@ public class TaskService {
     @CacheEvict(value = "task", key = "#taskId")
     public Mono<Void> deleteTask(Long taskId) {
         log.info("Delete task by id " + taskId);
-        return findByTaskId(taskId)
+        return taskRepository.deleteById(taskId)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
-                .flatMap(optionalTutorial -> {
-                    if (optionalTutorial.isEmpty()) {
-                        return Mono.error(new BadRequestException("Couldn't find task by task id " + taskId));
+                .flatMap(longOptional -> {
+                    if (longOptional.isEmpty()) {
+                        return Mono.error(new BadRequestException("Couldn't delete task id " + taskId));
                     }
-                    return taskRepository.deleteById(taskId);
+                    return Mono.empty();
                 });
     }
 

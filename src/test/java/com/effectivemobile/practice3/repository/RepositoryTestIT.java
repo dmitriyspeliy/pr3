@@ -6,6 +6,7 @@ import com.effectivemobile.practice3.model.entity.Task;
 import com.effectivemobile.practice3.repository.impl.TaskRepositoryImpl;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -60,6 +61,8 @@ public class RepositoryTestIT extends ConfigDB {
     @DisplayName(value = "Find by id")
     @Test
     @Order(1)
+    @Sql(scripts = {"classpath:/sql/task.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = {"classpath:/sql/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void when_invokeMethodFindByID_return_Task() {
         assertNotNull(taskRepository);
         Task task = taskRepository.findById(1L).block();
